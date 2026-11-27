@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Try Out CPNS — Latihan SKD</title>
+<style>
+:root{--navy:#14243b;--blue:#2563eb;--pale:#eff6ff;--ink:#172033;--muted:#64748b;--line:#e2e8f0;--green:#15803d;--red:#b91c1c;--bg:#f4f7fb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink)}
+header{background:linear-gradient(120deg,#14243b,#1e40af);color:white;padding:24px max(20px,calc((100% - 1100px)/2))}
+header h1{margin:0 0 6px;font-size:clamp(22px,4vw,30px)}header p{margin:0;color:#dbeafe}
+.wrap{max-width:1100px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px}
+.panel,.sidebar{background:white;border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 22px #0f172a0a}
+.panel{padding:24px}.sidebar{padding:20px;height:max-content;position:sticky;top:16px}
+.fieldgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+label{display:block;font-size:13px;font-weight:700;color:#475569;margin-bottom:6px}
+input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:9px;font:inherit}
+.progressrow{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin:14px 0 8px}
+.progress{height:8px;background:#e2e8f0;border-radius:9px;overflow:hidden}.progress span{display:block;height:100%;background:var(--blue);width:0;transition:.2s}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:24px 0 12px}
+.qnum{font-size:13px;font-weight:800;color:var(--blue);background:var(--pale);padding:7px 10px;border-radius:8px}
+.category{font-size:12px;color:var(--muted);font-weight:700}
+.question{font-size:17px;line-height:1.65;margin:0 0 16px}
+.options{display:grid;gap:10px}
+.option{display:flex;align-items:flex-start;gap:11px;border:1px solid var(--line);border-radius:11px;padding:12px;cursor:pointer;transition:.15s}
+.option:hover{border-color:#93c5fd;background:#f8fbff}.option.selected{border-color:var(--blue);background:#eff6ff}
+.option input{width:17px;height:17px;margin:2px 0 0;accent-color:var(--blue);flex:none}
+.option strong{display:inline-block;min-width:22px}
+.visual{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 20px}
+.tile{border:2px solid #334155;border-radius:8px;padding:8px;background:#fff;min-width:64px;text-align:center}
+.tile svg{width:62px;height:62px;display:block}
+.matrix{display:grid;grid-template-columns:repeat(3,70px);gap:8px;justify-content:center;margin:16px auto}
+.figure-choice{display:flex;align-items:center;gap:8px}
+.figure-choice .tile{min-width:76px}
+.feedback{margin-top:18px;padding:16px;border-radius:12px;line-height:1.6;display:none}
+.feedback.good{display:block;background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d}
+.feedback.bad{display:block;background:#fff1f2;border:1px solid #fecdd3;color:#881337}
+.feedback h3{font-size:15px;margin:0 0 7px}
+.actions{display:flex;justify-content:space-between;gap:10px;margin-top:24px}
+button{border:0;border-radius:10px;padding:12px 17px;font-weight:750;font-size:14px;cursor:pointer}
+.primary{background:var(--blue);color:white}.primary:hover{background:#1d4ed8}.secondary{background:#eef2f7;color:#334155}.secondary:disabled{opacity:.45;cursor:not-allowed}
+.sidebar h3{margin:0 0 14px;font-size:16px}.gridnums{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.num{padding:9px 0;background:#f1f5f9;color:#475569;border-radius:7px;text-align:center;font-size:13px;cursor:pointer}
+.num.done{background:#dbeafe;color:#1d4ed8;font-weight:800}.num.current{outline:2px solid var(--blue);font-weight:800}
+.legend{font-size:12px;color:var(--muted);line-height:1.8;margin:14px 0}
+.timer{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;margin:8px 0 18px;color:var(--navy)}
+.result{display:none}.result:not([hidden]){display:block}.result h2{margin-top:0}.score{font-size:42px;font-weight:850;color:var(--blue);margin:6px 0}
+.review{border-top:1px solid var(--line);padding:16px 0}.review p{line-height:1.55;margin:6px 0}
+.small{font-size:12px;color:var(--muted)}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}.sidebar{position:static;order:-1}.gridnums{grid-template-columns:repeat(7,1fr)}}
+@media(max-width:520px){.panel{padding:17px}.fieldgrid{grid-template-columns:1fr}.question{font-size:16px}.actions button{flex:1}.gridnums{grid-template-columns:repeat(7,1fr)}}
+</style>
+</head>
+<body>
+<header><h1>TRY OUT CPNS — LATIHAN SKD</h1><p>Latihan kemampuan numerik, verbal, logika, dan figural • 21 soal</p></header>
+<div class="wrap">
+<main class="panel">
+<section id="intro">
+ <div class="fieldgrid">
+  <div><label for="nama">Nama peserta</label><input id="nama" placeholder="Masukkan nama lengkap"></div>
+  <div><label for="kontak">Email / No. WhatsApp (opsional)</label><input id="kontak" placeholder="Kontak peserta"></div>
+ </div>
+ <p class="small">Petunjuk: Pilih satu jawaban untuk setiap soal. Jawaban dan pembahasan akan ditampilkan setelah tombol Selesai ditekan. Jika jawaban salah, sistem langsung menunjukkan jawaban yang benar beserta cara mengerjakannya.</p>
+ <button class="primary" onclick="startQuiz()">Mulai Try Out</button>
+</section>
+<section id="quiz" hidden>
+ <div class="progressrow"><span id="progressText">Soal 1 dari 21</span><span id="answeredText">Terjawab: 0</span></div><div class="progress"><span id="progressBar"></span></div>
+ <div class="qhead"><span class="qnum" id="qnum">SOAL 1</span><span class="category" id="category"></span></div>
+ <p class="question" id="question"></p><div id="visual"></div><div class="options" id="options"></div>
+ <div class="actions"><button class="secondary" id="prev" onclick="move(-1)">← Sebelumnya</button><button class="primary" id="next" onclick="move(1)">Selanjutnya →</button></div>
+ <div style="margin-top:18px;text-align:right"><button type="button" class="secondary" onclick="finishQuiz()">Selesai & Lihat Hasil</button></div>
+</section>
+<section id="result" class="result" hidden></section>
+</main>
+<aside class="sidebar" id="side" hidden>
+ <h3>Ringkasan Try Out</h3><div class="small">Waktu tersisa</div><div class="timer" id="timer">30:00</div>
+ <div class="small" style="margin-bottom:9px">Navigasi soal</div><div class="gridnums" id="numbers"></div>
+ <div class="legend">Biru = sudah dijawab<br>Garis tepi = soal aktif<br>Abu-abu = belum dijawab</div>
+ <button type="button" class="primary" style="width:100%" onclick="finishQuiz()">Kumpulkan Jawaban</button>
+</aside>
+</div>
+<script>
+const starSVG=(kind='detail',dot='right')=>{
+ const dotPos={top:[31,7],left:[7,55],right:[57,38],tl:[8,8]}[dot]||[57,38];
+ let inner=kind==='plain'?'':kind==='filled'?'':'<path d="M31 13 L31 54 L48 28 L15 47 L45 47 L21 24" fill="none" stroke="#111" stroke-width="2.1"/>';
+ return `<svg viewBox="0 0 64 64"><polygon points="32,5 39,24 59,24 43,36 49,57 32,44 15,57 21,36 5,24 25,24" fill="${kind==='filled'?'#111':'white'}" stroke="#111" stroke-width="2.5"/>${inner}<circle cx="${dotPos[0]}" cy="${dotPos[1]}" r="3.6" fill="#111"/></svg>`;
+};
+const hexSVG=`<svg viewBox="0 0 64 64"><path d="M32 9 L48 18 L48 46 L32 55 L16 46 L16 18 Z M32 9 L32 55" fill="none" stroke="#111" stroke-width="2.5"/><circle cx="32" cy="4" r="3.5" fill="#111"/></svg>`;
+const diamondSVG=`<svg viewBox="0 0 64 64"><path d="M32 7 L55 32 L32 55 L9 32 Z" fill="#111"/><path d="M32 24 L41 32 L32 40 L27 32 Z" fill="white"/><circle cx="7" cy="57" r="3.5" fill="#111"/></svg>`;
+const q13star=starSVG('detail','right');
+
+const arrowCell=(dirs)=>{
+ const ends={U:[32,8],R:[56,32],D:[32,56],L:[8,32]};
+ const paths=dirs.map(d=>{
+  const [x,y]=ends[d];
+  let line,head;
+  if(d==='U'){line=`M32 27 V13`;head=`M27 17 L32 9 L37 17`;}
+  if(d==='D'){line=`M32 37 V51`;head=`M27 47 L32 55 L37 47`;}
+  if(d==='L'){line=`M27 32 H13`;head=`M17 27 L9 32 L17 37`;}
+  if(d==='R'){line=`M37 32 H51`;head=`M47 27 L55 32 L47 37`;}
+  return `<path d="${line}" fill="none" stroke="#111" stroke-width="2.6" stroke-linecap="round"/><path d="${head}" fill="#111"/>`;
+ }).join('');
+ return `<svg viewBox="0 0 64 64" aria-hidden="true">${paths}<circle cx="32" cy="32" r="4.2" fill="white" stroke="#111" stroke-width="1.8"/></svg>`;
+};
+const sixPointStar=(line,dotX,dotY)=>{
+ const pts=[];
+ for(let i=0;i<12;i++){
+  const a=(-90+i*30)*Math.PI/180, r=i%2===0?27:17;
+  pts.push(`${(32+r*Math.cos(a)).toFixed(1)},${(32+r*Math.sin(a)).toFixed(1)}`);
+ }
+ let stroke='';
+ if(line==='vertical') stroke='<path d="M32 2 V62" stroke="#222" stroke-width="1.8"/>';
+ if(line==='horizontal') stroke='<path d="M2 32 H62" stroke="#222" stroke-width="1.8"/>';
+ if(line==='updiag') stroke='<path d="M8 56 L56 8" stroke="#222" stroke-width="1.8"/>';
+ if(line==='downdiag') stroke='<path d="M8 8 L56 56" stroke="#222" stroke-width="1.8"/>';
+ return `<svg viewBox="0 0 64 64" aria-hidden="true"><polygon points="${pts.join(' ')}" fill="white" stroke="#222" stroke-width="1.8" stroke-linejoin="round"/>${stroke}<circle cx="${dotX}" cy="${dotY}" r="3.8" fill="#111"/></svg>`;
+};
+
+const qs=[
+{cat:'Figural',q:'Perhatikan matriks 3 × 3 berikut. Pilih gambar yang paling tepat untuk menggantikan tanda tanya.',visual:`<div class="matrix">${[['U','R'],['U','D'],['U','R','D'],['L'],['U','L'],['U','L'],['U','L','R'],['U','L','D'],['U','L','R','D']].slice(0,8).map(d=>`<div class="tile">${arrowCell(d)}</div>`).join('')}<div class="tile" style="font-size:38px;display:grid;place-items:center">?</div></div><div style="border-top:1px solid #cbd5e1;margin:18px auto 12px;max-width:620px"></div><div class="visual">${[['R','D'],['U','L'],['U','L','R'],['U','L','D'],['U','L','R','D']].map((d,i)=>`<div class="figure-choice"><div class="tile">${arrowCell(d)}</div><b>${'ABCDE'[i]}</b></div>`).join('')}</div>`,
+opts:['A','B','C','D','E'],ans:4,exp:'Perhatikan arah panah pada setiap baris. Pada baris pertama, gambar ketiga merupakan gabungan arah panah dari gambar pertama dan kedua: atas + kanan digabung dengan atas + bawah menghasilkan atas, kanan, dan bawah. Pada baris kedua, gambar ketiga mempertahankan arah yang sama seperti gabungan gambar pertama dan kedua, yaitu atas dan kiri. Maka pada baris ketiga, gambar pertama memiliki arah atas, kiri, dan kanan, sedangkan gambar kedua memiliki arah atas, kiri, dan bawah. Gabungannya adalah empat arah: atas, kanan, bawah, dan kiri. Jadi jawabannya E.'},
+{cat:'Numerik',q:'Nilai operasi manakah yang sama dengan 432 ÷ 18?',opts:['540 ÷ 20','384 ÷ 12','630 ÷ 30','456 ÷ 24','600 ÷ 25'],ans:4,exp:'432 ÷ 18 = 24. Periksa pilihan: 600 ÷ 25 = 24. Jadi jawabannya E.'},
+{cat:'Figural',q:'Pilih satu gambar yang berbeda dari empat gambar lainnya.',visual:'<div class="visual">'+[['vertical',32,23],['horizontal',22,32],['updiag',34,28],['vertical',42,40],['downdiag',40,39]].map((r,i)=>`<div class="figure-choice"><div class="tile">${sixPointStar(r[0],r[1],r[2])}</div><b>${'ABCDE'[i]}</b></div>`).join('')+'</div>',opts:['A','B','C','D','E'],ans:3,exp:'Perhatikan posisi titik hitam terhadap garis yang melintasi bintang. Pada gambar A, B, C, dan E, titik hitam tepat berada pada garis. Pada gambar D, garis melintas secara vertikal, tetapi titik hitam berada di sebelah kanan garis dan tidak menyentuhnya. Jadi gambar yang berbeda adalah D.'},
+{cat:'Penalaran',q:'Apakah bilangan bulat n kelipatan 4?<br><br>(1) n kelipatan 12.<br>(2) n kelipatan 6.',opts:['Masing-masing pernyataan secara terpisah sudah cukup.','Pernyataan (2) saja cukup, sedangkan (1) tidak.','Kedua pernyataan bersama-sama pun belum cukup.','Kedua pernyataan harus digunakan bersama-sama.','Pernyataan (1) saja cukup, sedangkan (2) tidak.'],ans:4,exp:'Pernyataan (1): setiap kelipatan 12 pasti kelipatan 4, sehingga jawabannya pasti “ya”. Ini cukup. Pernyataan (2): kelipatan 6 bisa 6 (bukan kelipatan 4) atau 12 (kelipatan 4), sehingga tidak cukup. Jadi E.'},
+{cat:'Numerik',q:'Perhatikan pasangan nilai berikut. Masukan 2 menghasilkan keluaran 7, masukan 3 menghasilkan keluaran 12, dan masukan 5 menghasilkan keluaran 22. Jika keluaran bernilai 42, masukannya adalah …',visual:'<div class="visual"><table style="border-collapse:collapse;text-align:center"><tr><th style="background:#173451;color:white;padding:9px">Masukan</th><td style="border:1px solid #cbd5e1;padding:9px 18px">2</td><td style="border:1px solid #cbd5e1;padding:9px 18px">3</td><td style="border:1px solid #cbd5e1;padding:9px 18px">5</td></tr><tr><th style="background:#173451;color:white;padding:9px">Keluaran</th><td style="border:1px solid #cbd5e1">7</td><td style="border:1px solid #cbd5e1">12</td><td style="border:1px solid #cbd5e1">22</td></tr></table></div>',opts:['11','7','10','8','9'],ans:4,exp:'Pola keluarannya adalah (masukan × 5) − 3. Cek: 2×5−3=7; 3×5−3=12; 5×5−3=22. Jika keluaran 42: 5x−3=42 → 5x=45 → x=9. Jawaban E.'},
+{cat:'Numerik',q:'Pecahan 5/8 dinyatakan sebagai persentase menjadi …',opts:['58%','60,5%','6,25%','625%','62,5%'],ans:4,exp:'Untuk mengubah pecahan menjadi persen, kalikan 100%. 5/8 = 0,625. Maka 0,625 × 100% = 62,5%. Jawaban E.'},
+{cat:'Numerik',q:'Lima penyedia menawarkan biaya pengadaan 40 map. Harga per map dan ongkos kirim masing-masing adalah berikut. Penyedia mana memberi biaya total terendah?',visual:'<div class="visual"><table style="border-collapse:collapse;text-align:center;font-size:13px"><tr style="background:#173451;color:white"><th style="padding:8px">Penyedia</th><th>Harga/map</th><th>Ongkos kirim</th></tr>'+[['A','8.200','45.000'],['B','9.100','0'],['C','7.400','75.000'],['D','9.500','0'],['E','8.600','25.000']].map(r=>`<tr>${r.map(c=>`<td style="border:1px solid #cbd5e1;padding:7px">${c}</td>`).join('')}</tr>`).join('')+'</table></div>',opts:['Penyedia A','Penyedia C','Penyedia E','Penyedia B','Penyedia D'],ans:3,exp:'Hitung total untuk 40 map: A = 40×8.200+45.000 = Rp373.000; B = 40×9.100 = Rp364.000; C = 40×7.400+75.000 = Rp371.000; D = 40×9.500 = Rp380.000; E = 40×8.600+25.000 = Rp369.000. Terendah adalah B, Rp364.000. Jawaban D.'},
+{cat:'Numerik',q:'Diketahui P = 5/8 dan Q = 0,6. Hubungan kedua kuantitas tersebut adalah …',opts:['P = Q','Q = P + 0,5','P > Q','P < Q','P = 2Q'],ans:2,exp:'Ubah P menjadi desimal: 5/8 = 0,625. Sementara Q = 0,6. Karena 0,625 lebih besar daripada 0,6, maka P > Q. Jawaban C.'},
+{cat:'Penalaran',q:'Dalam lomba, Deni lebih cepat dari Bima. Citra lebih cepat dari Amir. Bima lebih cepat dari Eka, dan Amir lebih cepat dari Deni. Siapa berada pada urutan ketiga jika diurut dari yang tercepat?',opts:['Eka','Bima','Deni','Citra','Amir'],ans:2,exp:'Susun hubungan kecepatannya: Citra > Amir > Deni > Bima > Eka. Urutan ketiga adalah Deni. Jawaban C.'},
+{cat:'Numerik',q:'Pada peta berskala 1 : 250.000, jarak dua lokasi 0,7 cm. Jarak sebenarnya adalah …',opts:['175 km','0,175 km','17,5 km','1,75 km','0,75 km'],ans:3,exp:'Skala 1:250.000 berarti 1 cm pada peta = 250.000 cm sebenarnya. Jarak sebenarnya = 0,7 × 250.000 = 175.000 cm. Ubah ke km: 175.000 ÷ 100.000 = 1,75 km. Jawaban D.'},
+{cat:'Penalaran',q:'Pengurus perpustakaan menyatakan bahwa jam buka lebih panjang akan meningkatkan jumlah kunjungan. Bukti yang paling relevan untuk menguji pernyataan itu?',opts:['Catatan kunjungan harian sebulan sebelum dan sesudah jam buka diperpanjang.','Perbandingan jumlah kunjungan pada dua hari pertama setelah jam buka diperpanjang.','Catatan jumlah kunjungan pada jam tambahan selama sebulan pemberlakuan.','Proporsi pengunjung yang datang pada jam layanan lama sesudah perubahan.','Data jumlah anggota perpustakaan selama bulan pemberlakuan jam baru.'],ans:0,exp:'Untuk menguji apakah perpanjangan jam buka meningkatkan kunjungan, bandingkan data kunjungan sebelum dan sesudah perubahan dalam periode yang cukup panjang. Catatan harian selama sebulan di kedua periode memberikan pembanding yang paling relevan. Jawaban A.'},
+{cat:'Verbal',q:'PAHAT : MENGUKIR = …',opts:['JARUM : MENJAHIT','PAHAT : KAYU','KAIN : MENJAHIT','GERGAJI : TAJAM','JARUM : BENANG'],ans:0,exp:'Hubungannya adalah alat dan kegiatan yang dilakukan menggunakan alat tersebut: pahat digunakan untuk mengukir. Jarum digunakan untuk menjahit. Jawaban A.'},
+{cat:'Figural',q:'Pilih gambar yang paling tepat untuk melanjutkan deret.',visual:`<div class="visual">${[hexSVG,diamondSVG,q13star].map(s=>`<div class="tile">${s}</div>`).join('')}<div style="font-size:26px">→</div>${[hexSVG,diamondSVG].map(s=>`<div class="tile">${s}</div>`).join('')}<div class="tile" style="font-size:38px">?</div></div><div class="visual">${['A','B','C','D','E'].map((l,i)=>`<div class="figure-choice"><div class="tile">${starSVG(['detail','detail','filled','plain','detail'][i],['right','tl','right','right','right'][i])}</div><b>${l}</b></div>`).join('')}</div>`,opts:['A','B','C','D','E'],ans:0,exp:'Pola gambar berulang setiap tiga bentuk: (1) bangun segi enam, (2) belah ketupat hitam, (3) bintang dengan garis bagian dalam dan titik di sisi kanan. Urutan ke-6 sama dengan urutan ke-3, yaitu gambar A.'},
+{cat:'Penalaran',q:'Semua penerjemah tersumpah menguasai dua bahasa. Sebagian pegawai adalah penerjemah tersumpah. Setiap orang yang menguasai dua bahasa dapat ditugaskan di loket internasional. Kesimpulan yang pasti benar adalah …',opts:['Semua yang dapat ditugaskan di loket internasional adalah pegawai.','Sebagian pegawai dapat ditugaskan di loket internasional.','Sebagian penerjemah tersumpah bukan pegawai.','Semua pegawai dapat ditugaskan di loket internasional.','Pegawai yang bukan penerjemah tersumpah tidak dapat ditugaskan di loket internasional.'],ans:1,exp:'Sebagian pegawai adalah penerjemah tersumpah. Semua penerjemah tersumpah menguasai dua bahasa, dan semua yang menguasai dua bahasa dapat ditugaskan di loket internasional. Jadi, sebagian pegawai (yang merupakan penerjemah tersumpah) dapat ditugaskan di loket internasional. Jawaban B.'},
+{cat:'Numerik',q:'Deret 3, 5, 7, 11, 13, … dilanjutkan oleh bilangan …',opts:['15','19','14','16','17'],ans:4,exp:'Deret tersebut adalah bilangan prima berurutan: 3, 5, 7, 11, 13. Bilangan prima berikutnya adalah 17. Jawaban E.'},
+{cat:'Numerik',q:'Bilangan berikutnya pada deret 5, 9, 17, 33, … adalah …',opts:['57','66','49','61','65'],ans:4,exp:'Selisih antarbilangan berturut-turut adalah +4, +8, +16. Selisihnya selalu dikali 2, sehingga selisih berikutnya +32. Maka 33 + 32 = 65. Jawaban E.'},
+{cat:'Numerik',q:'Empat baris bilangan mengikuti aturan yang sama. Angka pengganti tanda tanya adalah …',visual:'<div class="visual"><table style="border-collapse:collapse;text-align:center;font-size:17px">'+[[2,4,10],[3,5,18],[5,2,15],[4,6,'?']].map(r=>`<tr>${r.map(c=>`<td style="border:1px solid #94a3b8;padding:9px 24px">${c}</td>`).join('')}</tr>`).join('')+'</table></div>',opts:['26','24','28','30','22'],ans:2,exp:'Pola setiap baris: angka pertama × angka kedua + angka pertama. Baris 1: 2×4+2=10. Baris 2: 3×5+3=18. Baris 3: 5×2+5=15. Baris 4: 4×6+4=28. Jawaban C.'},
+{cat:'Penalaran',q:'Setelah tersedia tempat sampah tambahan, pengelola taman mencatat sampah berserakan lebih sedikit dan menyimpulkan bahwa penambahan itu penyebabnya. Informasi apa yang paling melemahkan?',opts:['Pengunjung mengaku lebih mudah menemukan tempat sampah sesudah pemasangan.','Pada periode yang sama, penyapuan taman ditambah menjadi tiga kali sehari.','Tempat sampah baru dipakai bersamaan dengan tempat sampah lama yang sudah ada.','Tempat sampah baru dipasang terutama di jalur pengunjung yang ramai.','Jumlah pengunjung sesudah pemasangan relatif sama dengan sebelumnya.'],ans:1,exp:'Kesimpulan menyatakan tempat sampah tambahan menyebabkan sampah berkurang. Namun, jika pada saat yang sama frekuensi penyapuan juga ditambah menjadi tiga kali sehari, penurunan sampah bisa disebabkan oleh penyapuan yang lebih sering, bukan semata-mata tempat sampah tambahan. Ini melemahkan hubungan sebab-akibat. Jawaban B.'},
+{cat:'Numerik',q:'Manakah perbandingan hasil operasi yang benar?',opts:['96 ÷ 8 > 7 + 6','81 − 27 > 6 × 8','100 − 37 < 7 × 9','8 × 7 < 120 − 66','45 + 19 = 9 × 7'],ans:1,exp:'Periksa pilihan B: 81−27 = 54, sedangkan 6×8 = 48. Karena 54 > 48, pernyataan B benar. Pilihan lain: A 12>13 salah; C 63<63 salah; D 56<54 salah; E 64=63 salah.'},
+{cat:'Numerik',q:'Hasil 7/8 − 0,35 adalah …',opts:['0,425','0,525','0,625','0,575','0,475'],ans:1,exp:'Ubah 7/8 menjadi desimal: 7 ÷ 8 = 0,875. Kemudian 0,875 − 0,35 = 0,525. Jawaban B.'},
+{cat:'Penalaran',q:'Setiap anggota tim A memiliki kartu identitas. Tidak seorang pun yang memiliki kartu identitas dilarang masuk ruang arsip. Rudi dilarang masuk ruang arsip. Kesimpulan sah adalah …',opts:['Rudi bukan anggota tim A.','Rudi anggota tim A yang kehilangan kartu identitas.','Setiap orang di ruang arsip pasti anggota tim A.','Semua orang yang boleh masuk adalah anggota tim A.','Rudi memiliki kartu identitas.'],ans:0,exp:'Semua anggota tim A memiliki kartu identitas. Orang yang memiliki kartu identitas tidak dilarang masuk. Jadi, anggota tim A pasti tidak dilarang masuk. Rudi justru dilarang masuk, sehingga Rudi bukan anggota tim A. Ini menggunakan kontraposisi. Jawaban A.'}
+];
+let current=0,answers=Array(qs.length).fill(null),remaining=30*60,tick=null,started=false;
+function startQuiz(){document.getElementById('intro').hidden=true;document.getElementById('quiz').hidden=false;document.getElementById('side').hidden=false;started=true;render();tick=setInterval(()=>{remaining--;document.getElementById('timer').textContent=fmt(remaining);if(remaining<=0)finishQuiz()},1000)}
+function fmt(n){return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0')}
+function render(){let q=qs[current];document.getElementById('qnum').textContent='SOAL '+(current+1);document.getElementById('category').textContent=q.cat;document.getElementById('question').innerHTML=q.q;document.getElementById('visual').innerHTML=q.visual||'';document.getElementById('options').innerHTML=q.opts.map((o,i)=>`<label class="option ${answers[current]===i?'selected':''}"><input type="radio" name="answer" ${answers[current]===i?'checked':''} onchange="choose(${i})"><span><strong>${'ABCDE'[i]}.</strong> ${o}</span></label>`).join('');document.getElementById('prev').disabled=current===0;document.getElementById('next').textContent=current===qs.length-1?'Kembali ke awal':'Selanjutnya →';document.getElementById('progressText').textContent=`Soal ${current+1} dari ${qs.length}`;document.getElementById('answeredText').textContent=`Terjawab: ${answers.filter(x=>x!==null).length}`;document.getElementById('progressBar').style.width=(answers.filter(x=>x!==null).length/qs.length*100)+'%';document.getElementById('numbers').innerHTML=qs.map((_,i)=>`<div class="num ${answers[i]!==null?'done':''} ${i===current?'current':''}" onclick="jump(${i})">${i+1}</div>`).join('')}
+function choose(i){answers[current]=i;render()}
+function move(d){if(current===qs.length-1&&d===1)current=0;else current=Math.max(0,Math.min(qs.length-1,current+d));render()}
+function jump(i){current=i;render()}
+function finishQuiz(){
+ if(!started){alert('Silakan klik Mulai Try Out terlebih dahulu.');return;}
+ clearInterval(tick);
+ document.getElementById('quiz').hidden=true;
+ document.getElementById('side').hidden=true;
+ document.getElementById('result').hidden=false;let correct=0;qs.forEach((q,i)=>{if(answers[i]===q.ans)correct++});let pct=Math.round(correct/qs.length*100);let name=document.getElementById('nama').value.trim()||'Peserta';let result=document.getElementById('result');result.style.display='block';result.innerHTML=`<h2>Hasil Try Out</h2><p>Peserta: <b>${escapeHTML(name)}</b></p><div class="score">${correct}/${qs.length}</div><p><b>${pct}% jawaban benar</b> • ${qs.length-correct} jawaban salah/kosong</p><p class="small">Waktu digunakan: ${fmt(30*60-remaining)}</p><hr style="border:0;border-top:1px solid #e2e8f0;margin:22px 0"><h3>Pembahasan seluruh soal</h3>`+qs.map((q,i)=>{let ok=answers[i]===q.ans;return `<div class="review"><p><b>Soal ${i+1} — ${ok?'Benar':'Belum tepat'}</b></p><p>${q.q}</p><p>Jawaban Anda: <b>${answers[i]===null?'Belum dijawab':'ABCDE'[answers[i]]}</b> • Jawaban benar: <b>${'ABCDE'[q.ans]}</b></p><p>${q.exp}</p></div>`}).join('')+`<button class="primary" onclick="location.reload()">Ulangi Try Out</button>`}
+function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+</script>
+</body></html>
